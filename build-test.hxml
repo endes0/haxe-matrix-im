@@ -1,0 +1,11 @@
+-cp src/
+-cp test/
+
+-main beartek.matrix_im.client.Test_unit
+
+-lib https-client
+-lib mohxa
+
+-debug
+
+-neko bin/test.n
