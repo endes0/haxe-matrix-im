@@ -3,7 +3,7 @@
 
 -main beartek.matrix_im.client.Test_unit
 
--lib https-client
+-lib http-client
 -lib mohxa
 
 -debug

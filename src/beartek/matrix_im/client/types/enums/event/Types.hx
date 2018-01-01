@@ -30,4 +30,6 @@ package beartek.matrix_im.client.types.enums.event;
   var Answer = 'm.call.answer';
   var Invite = 'm.call.candidates';
   var Hangup = 'm.call.hangup';
+
+  var Widgets = 'im.vector.modular.widgets';
 }
