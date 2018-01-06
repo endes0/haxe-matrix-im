@@ -11,4 +11,12 @@ class Check_reply {
     }
   }
 
+  static public function is_UIA( t : Dynamic ) : Bool {
+    if( Reflect.field(t, 'flows') == null ) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
 }
