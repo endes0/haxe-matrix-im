@@ -6,6 +6,6 @@
 -lib akifox-asynchttp
 -lib mohxa
 
--debug
+#-debug
 
 -neko bin/test.n

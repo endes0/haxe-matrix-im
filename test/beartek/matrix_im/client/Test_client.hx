@@ -27,8 +27,24 @@ class Test_client extends mohxa.Mohxa {
     });
     this.test_login();
 
+    this.test_server_adm();
+
 
     this.test_logout();
+  }
+
+  public function test_server_adm() : Void {
+    this.describe('Probando Administracion del servidor', function() : Void {
+      this.it('Obteniendo versiones del protocolo', function() : Void {
+        this.log(conection.server.versions);
+        this.equal(conection.server.versions.length > 0, true);
+      });
+      this.it('Haciendo WHOIS (falla si el usuario no es admin en el servidor)', function() : Void {
+        conection.server.whois(conection.session.user, function( response : Dynamic ) : Void {
+          this.log(Std.string(response));
+        });
+      });
+    });
   }
 
   public function test_login() : Void {

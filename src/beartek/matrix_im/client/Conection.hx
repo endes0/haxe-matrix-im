@@ -8,11 +8,14 @@ import beartek.matrix_im.client.types.replys.Error;
 
 
 class Conection {
+  public var server : Server_adm;
   public var session : Session;
   var responses_handlers : Map<Int,Array<Int -> Dynamic -> Bool>> = new Map();
 
   public function new( server_url : String ) {
     this.session = new Session(this.on_responses, this.send_request, server_url);
+    this.server = new Server_adm(this.on_responses, this.send_request, server_url);
+    this.server.get_versions();
 
   }
 
