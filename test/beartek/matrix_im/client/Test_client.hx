@@ -3,9 +3,9 @@ package beartek.matrix_im.client;
 
 import com.akifox.asynchttp.AsyncHttp;
 import beartek.matrix_im.client.Conection;
-import beartek.matrix_im.client.auths.Auth;
-import beartek.matrix_im.client.auths.M_login_password;
+import beartek.matrix_im.client.auths.*;
 import beartek.matrix_im.client.types.*;
+import beartek.matrix_im.client.types.replys.*;
 import beartek.matrix_im.client.types.enums.*;
 
 class Test_client extends mohxa.Mohxa {
@@ -25,12 +25,140 @@ class Test_client extends mohxa.Mohxa {
         this.error = Std.string(e);
       }
     });
+    this.test_create_and_destroy();
     this.test_login();
 
     this.test_server_adm();
+    this.test_account();
 
 
     this.test_logout();
+  }
+
+  public function test_create_and_destroy() : Void {
+    this.describe('Probando a crear cuenta y borrarla', function() : Void {
+      this.it('Creandola', function() : Void {
+        conection.account.register( 'Tester_haxe_matrix_' + this.auth_data.user, this.auth_data.pass, false,
+        function( data : Login_data ) : Void {
+          this.log(Std.string(data));
+        }, function( type : Auths, auth : Dynamic ) : Void {
+            switch type {
+            case Auths.Password:
+              var a : M_login_password = auth;
+              a.login_with_user('Tester_haxe_matrix_' + this.auth_data.user, this.auth_data.pass);
+            case Auths.Email:
+              throw 'Identity server API not implemented';
+            case Auths.Token:
+              throw 'Not implemented';
+            case Auths.Dummy:
+              var a : M_login_dummy = auth;
+              a.make_pet();
+            case Auths.Oauth2:
+              var a : M_login_oauth2 = auth;
+              this.log('Go to: ' + a.get_uri() );
+              this.log('Login, and press any key to continue');
+
+              Sys.getChar(false);
+
+              a.make_pet();
+            case _:
+              var a : Unknow_auth = auth;
+              this.log('Go to: ' + a.get_fallback(conection.server_url));
+              this.log('Login, and press any key to continue');
+
+              Sys.getChar(false);
+
+              a.make_pet();
+            }
+          });
+      });
+      this.it('Borrandola', function() : Void {
+        conection.account.deactivate(function( n : Null<Dynamic> ) : Void {
+          this.log('Borrada');
+        }, function( type : Auths, auth : Dynamic ) : Void {
+            switch type {
+            case Auths.Password:
+              var a : M_login_password = auth;
+              a.login_with_user('Tester_haxe_matrix_' + this.auth_data.user, this.auth_data.pass);
+            case Auths.Email:
+              throw 'Identity server API not implemented';
+            case Auths.Token:
+              throw 'Not implemented';
+            case Auths.Dummy:
+              var a : M_login_dummy = auth;
+              a.make_pet();
+            case Auths.Oauth2:
+              var a : M_login_oauth2 = auth;
+              this.log('Go to: ' + a.get_uri() );
+              this.log('Login, and press any key to continue');
+
+              Sys.getChar(false);
+
+              a.make_pet();
+            case _:
+              var a : Unknow_auth = auth;
+              this.log('Go to: ' + a.get_fallback(conection.server_url));
+              this.log('Login, and press any key to continue');
+
+              Sys.getChar(false);
+
+              a.make_pet();
+            }
+          });
+      });
+    });
+  }
+
+  public function test_account() : Void {
+    this.describe('Probando Cuenta', function() : Void {
+      this.it('Obteniendo informacion de contacto', function() : Void {
+        conection.account.get_3pid(function( info : Array<Threepid> ) : Void {
+          this.log(info);
+        });
+      });
+      this.it('Quien soy', function() : Void {
+        conection.account.whoami(function( user : User ) : Void {
+          this.equal(user.equal(conection.session.user), true);
+        });
+      });
+      this.it('Cambiando pass a la misma pass', function() : Void {
+        conection.account.change_password(this.auth_data.pass,
+          function( n : Null<Dynamic> ) : Void {
+            this.log('changed. ' + n);
+        }, function( type : Auths, auth : Dynamic ) : Void {
+            switch type {
+            case Auths.Password:
+              var a : M_login_password = auth;
+              a.login_with_user(this.auth_data.user, this.auth_data.pass);
+            case Auths.Email:
+              throw 'Identity server API not implemented';
+            case Auths.Token:
+              throw 'Not implemented';
+            case Auths.Dummy:
+              var a : M_login_dummy = auth;
+              a.make_pet();
+            case Auths.Oauth2:
+              var a : M_login_oauth2 = auth;
+              this.log('Go to: ' + a.get_uri() );
+              this.log('Login, and press any key to continue');
+
+              Sys.getChar(false);
+
+              a.make_pet();
+            case _:
+              var a : Unknow_auth = auth;
+              this.log('Go to: ' + a.get_fallback(conection.server_url));
+              this.log('Login, and press any key to continue');
+
+              Sys.getChar(false);
+
+              a.make_pet();
+            }
+        });
+      });
+
+      //TODO: test para validate email, y anadir 3pid
+    });
   }
 
   public function test_server_adm() : Void {

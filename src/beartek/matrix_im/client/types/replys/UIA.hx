@@ -72,7 +72,7 @@ abstract UIA(UIA_body) {
     UIA_config.sessions.set(this.session,this.flows[n].stages);
   }
 
-  public inline function start( on_stage : Auths -> Auth -> Void, on_response : Dynamic -> Void, request : HttpRequest, request_sender : HttpRequest -> (Int -> Dynamic -> Void) -> Void ) : Void {
+  public inline function start( on_stage : Auths -> Dynamic -> Void, on_response : Dynamic -> Void, request : HttpRequest, request_sender : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void ) : Void {
     if( UIA_config.sessions.exists(this.session) ) {
       if( this.completed != null ) {
         for( stage in this.completed ) {
@@ -82,10 +82,13 @@ abstract UIA(UIA_body) {
 
       var auth : Dynamic = UIA_config.sessions[this.session][0];
       var name : String = auth;
-      var class_name : Class<Dynamic> = Type.resolveClass('beartek.matrix_im.client.auths.' + name.split('.').join('_'));
-      var instance : Auth;
-      if( class_name != null ) {
-        instance = Type.createInstance(class_name, [this.session, Reflect.field(this.params, name)]);
+      var class_name : Array<String> = name.split('.');
+      class_name[0] = class_name[0].toUpperCase();
+
+      var a_class : Class<Dynamic> = Type.resolveClass('beartek.matrix_im.client.auths.' + class_name.join('_'));
+      var instance : Dynamic;
+      if( a_class != null ) {
+        instance = Type.createInstance(a_class, [this.session, Reflect.field(this.params, name)]);
       } else {
         instance = new Unknow_auth(this.session, name);
       }
@@ -104,6 +107,13 @@ abstract UIA(UIA_body) {
     } else {
       throw 'No stage selected';
     }
+  }
+
+  public static function add_auth( request : HttpRequest, auth : Dynamic ) : HttpRequest {
+    var content : Dynamic = haxe.Json.parse(request.content);
+    content.auth = auth;
+    request.content = haxe.Json.stringify(content);
+    return request;
   }
 
 }

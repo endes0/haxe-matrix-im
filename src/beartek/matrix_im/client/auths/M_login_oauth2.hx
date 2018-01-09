@@ -4,8 +4,7 @@ package beartek.matrix_im.client.auths;
 import com.akifox.asynchttp.HttpRequest;
 import beartek.matrix_im.client.types.replys.UIA;
 
-@:keep class M_login_oath2 implements Auth {
-  public var request : HttpRequest;
+@:keep class M_login_oauth2 extends Auth {
   var session : String;
   var oauth_uri : String;
 
@@ -22,11 +21,8 @@ import beartek.matrix_im.client.types.replys.UIA;
   }
 
   public function make_pet() : Void {
-    request.content = haxe.Json.stringify({session: this.session});
+    request = UIA.add_auth(request, {session: this.session});
     this.send_request(request, this.on_response);
   };
-
-  dynamic public function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void ) : Void {};
-  dynamic public function on_response( status_code : Int, response : Dynamic ) : Void {};
 
 }

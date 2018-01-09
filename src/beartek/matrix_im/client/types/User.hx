@@ -25,6 +25,14 @@ abstract User(User_body) {
   public inline function get_server() : String {
     return this.server;
   }
+
+  public function equal( u : User ) : Bool {
+    if( this.name == u.get_user() && this.server == u.get_server() ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
 typedef User_body = {

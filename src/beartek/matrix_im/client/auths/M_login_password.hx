@@ -5,8 +5,7 @@ import com.akifox.asynchttp.HttpRequest;
 import beartek.matrix_im.client.types.replys.UIA;
 import beartek.matrix_im.client.types.enums.Auths;
 
-@:keep class M_login_password implements Auth {
-  public var request : HttpRequest;
+@:keep class M_login_password extends Auth {
   var session : String;
   var pet : Pet;
 
@@ -39,16 +38,13 @@ import beartek.matrix_im.client.types.enums.Auths;
 
   public function make_pet() : Void {
     if( pet != null ) {
-      request.content = haxe.Json.stringify(this.pet);
+      request = UIA.add_auth(request, this.pet);
       this.send_request(request, this.on_response);
     } else {
       throw 'Stage not completed';
     }
   };
 
-  dynamic public function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void ) : Void {};
-  dynamic public function on_response( status_code : Int, response : Dynamic ) : Void {
-  };
 }
 
 private typedef Pet = {

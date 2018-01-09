@@ -10,7 +10,7 @@ class Server_adm {
   var server : String;
   public var versions : Array<Version>;
 
-  public function new( on_responses : Int -> Dynamic -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> Void, server : String ) {
+  public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
     this.on_responses = on_responses;
     this.send_request = send_request;
     this.server = server;
@@ -52,11 +52,11 @@ class Server_adm {
     });
   }
 
-  dynamic function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void ) : Void {
+  dynamic function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void, ignore_errors : Bool = false ) : Void {
     throw 'Handler created erroniusly';
   }
 
-  dynamic function on_responses( status_code : Int, response : Dynamic ) : Bool {
+  dynamic function on_responses( status_code : Int, response : Dynamic, ignore_errors : Bool = false ) : Bool {
     return true;
   }
 

@@ -4,9 +4,8 @@ package beartek.matrix_im.client.auths;
 import com.akifox.asynchttp.HttpRequest;
 import beartek.matrix_im.client.types.replys.UIA;
 
-interface Auth {
+@:keep class Auth {
   public var request : HttpRequest;
-  public function make_pet() : Void;
-  dynamic function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void ) : Void;
-  dynamic public function on_response( status_code : Int, response : Dynamic ) : Void;
+  dynamic public function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void, ignore_errors : Bool = true ) : Void {};
+  dynamic public function on_response( status_code : Int, response : Dynamic ) : Void {};
 }

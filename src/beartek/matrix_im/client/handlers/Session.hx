@@ -6,6 +6,7 @@ import com.akifox.asynchttp.HttpMethod;
 import beartek.matrix_im.client.types.User;
 import beartek.matrix_im.client.types.enums.Auths;
 import beartek.matrix_im.client.types.replys.UIA;
+import beartek.matrix_im.client.types.replys.Login_data;
 import beartek.matrix_im.client.auths.Auth;
 
 class Session {
@@ -15,28 +16,25 @@ class Session {
 
   var server : String;
 
-  public function new( on_responses : Int -> Dynamic -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> Void, server : String ) {
+  public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
     this.on_responses = on_responses;
     this.send_request = send_request;
     this.server = server;
   }
 
-  public function login_with_pass( user : String, password : String, display_name : String = 'Matrix client on haxe', on_response : {access_token: String, device_id: String, home_server: String, user_id: String} -> Void ) : Void {
+  public function login_with_pass( user : String, password : String, display_name : String = 'Matrix client on haxe', on_response : Login_data -> Void ) : Void {
     var data = {
       initial_device_display_name: display_name,
       password: password,
       type: Auths.Password,
       user: user
     };
-    this.send_request(Conection.make_request(HttpMethod.POST, server + '/_matrix/client/r0/login', data ), function( code : Int, data : {access_token: String, device_id: String, home_server: String, user_id: String} ) : Void {
-      this.access_token = data.access_token;
-      this.device = data.device_id;
-      this.user = new User(data.user_id);
-      on_response(data);
+    this.send_request(Conection.make_request(HttpMethod.POST, server + '/_matrix/client/r0/login', data ), function( code : Int, data : Login_data ) : Void {
+      this.fallback_handler(data, on_response);
     });
   }
 
-  public function login_with_email( email : String, password : String, display_name : String = 'Matrix client on haxe', on_response : {access_token: String, device_id: String, home_server: String, user_id: String} -> Void ) : Void {
+  public function login_with_email( email : String, password : String, display_name : String = 'Matrix client on haxe', on_response : Login_data -> Void ) : Void {
     var data = {
       address: email,
       initial_device_display_name: display_name,
@@ -44,26 +42,31 @@ class Session {
       password: password,
       type: Auths.Password
     };
-    this.send_request(Conection.make_request(HttpMethod.POST, server + '/_matrix/client/r0/login', data ), function( code : Int, data : {access_token: String, device_id: String, home_server: String, user_id: String} ) : Void {
-      this.access_token = data.access_token;
-      this.device = data.device_id;
-      this.user = new User(data.user_id);
-      on_response(data);
+    this.send_request(Conection.make_request(HttpMethod.POST, server + '/_matrix/client/r0/login', data ), function( code : Int, data : Login_data ) : Void {
+      this.fallback_handler(data, on_response);
     });
   }
 
-  public function login_with_token( token : String, display_name : String = 'Matrix client on haxe', on_response : {access_token: String, device_id: String, home_server: String, user_id: String} -> Void ) : Void {
+  public function login_with_token( token : String, display_name : String = 'Matrix client on haxe', on_response : Login_data -> Void ) : Void {
     var data = {
       initial_device_display_name: display_name,
       token: token,
       type: Auths.Token
     };
-    this.send_request(Conection.make_request(HttpMethod.POST, server + '/_matrix/client/r0/login', data ), function( code : Int, data : {access_token: String, device_id: String, home_server: String, user_id: String} ) : Void {
-      this.access_token = data.access_token;
-      this.device = data.device_id;
-      this.user = new User(data.user_id);
-      on_response(data);
+    this.send_request(Conection.make_request(HttpMethod.POST, server + '/_matrix/client/r0/login', data ), function( code : Int, data : Login_data ) : Void {
+      this.fallback_handler(data, on_response);
     });
+  }
+
+  public function get_fallback() : String {
+    return server + '/_matrix/static/client/login/';
+  }
+
+  public function fallback_handler( response : Login_data, on_response : Login_data -> Void ) : Void {
+    this.access_token = response.access_token;
+    this.device = response.device_id;
+    this.user = new User(response.user_id);
+    on_response(response);
   }
 
   public function logout( on_logout : Void -> Void ) : Void {
@@ -79,11 +82,11 @@ class Session {
     });
   }
 
-  dynamic function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void ) : Void {
+  dynamic function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void, ignore_errors : Bool = false ) : Void {
     throw 'Handler created erroniusly';
   }
 
-  dynamic function on_responses( status_code : Int, response : Dynamic ) : Bool {
+  dynamic function on_responses( status_code : Int, response : Dynamic, ignore_errors : Bool = false ) : Bool {
     return true;
   }
 }

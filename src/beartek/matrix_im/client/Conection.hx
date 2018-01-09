@@ -10,12 +10,21 @@ import beartek.matrix_im.client.types.replys.Error;
 class Conection {
   public var server : Server_adm;
   public var session : Session;
+  public var account : Account;
+
+  public var server_url(default, null) : String;
   var responses_handlers : Map<Int,Array<Int -> Dynamic -> Bool>> = new Map();
 
   public function new( server_url : String ) {
+    this.server_url = server_url;
+
     this.session = new Session(this.on_responses, this.send_request, server_url);
+
     this.server = new Server_adm(this.on_responses, this.send_request, server_url);
     this.server.get_versions();
+
+    this.account = new Account(this.on_responses, this.send_request, server_url);
+
 
   }
 
@@ -23,27 +32,28 @@ class Conection {
     var request = new HttpRequest({
       url: url,
       method: method,
-      contentType: "application/json",
-      content: haxe.Json.stringify(data)
+      contentType: if(data != null) "application/json" else null,
+      content: if(data != null) haxe.Json.stringify(data) else null
     });
     return request;
   }
 
-  private function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void ) : Void {
+  private function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void, ignore_errors : Bool = false ) : Void {
     if( this.session.access_token != null ) {
+    if( request.url.querystring == '' ) {
       request.url = new URL(request.url.toString() + '?access_token=' + this.session.access_token);
+    } else {
+      request.url = new URL(request.url.toString() + '&access_token=' + this.session.access_token);
+    }
     }
     #if debug
-    trace( 'sending request: ' + request );
+    trace( 'sending request: ' + request.content );
     #end
     request.callback = function( response : HttpResponse ) : Void {
       #if debug
       trace( 'callback called' );
       #end
-      if( response.error != '' ) {
-        throw response.error;
-      }
-      if( this.on_responses(response.status, response.toJson()) ) {
+      if( this.on_responses(response.status, response.toJson(), ignore_errors) ) {
         on_response(response.status, response.toJson());
       }
     };
@@ -51,7 +61,7 @@ class Conection {
     request.send();
   }
 
-  private function on_responses( status_code : Int, response : Dynamic ) : Bool {
+  private function on_responses( status_code : Int, response : Dynamic, ignore_errors : Bool = false ) : Bool {
     #if debug
     trace( 'recived reply: ' + status_code + ', ' + response );
     #end
@@ -59,11 +69,9 @@ class Conection {
     case 400 | 403 | 429 | 404:
       if( Check_reply.is_error(response) ) {
         this.on_error(response);
-      } else {
-        this.on_fatal_error('Invalid error recived');
       }
 
-      return false;
+      if(ignore_errors) return true else return false;
     case 401 | 200 | 302 :
       var is_all_true : Bool = true;
       if( responses_handlers[status_code] != null ) {
