@@ -11,6 +11,8 @@ class Conection {
   public var server : Server_adm;
   public var session : Session;
   public var account : Account;
+  public var filters : Filters;
+  public var sync : Sync;
 
   public var server_url(default, null) : String;
   var responses_handlers : Map<Int,Array<Int -> Dynamic -> Bool>> = new Map();
@@ -25,7 +27,9 @@ class Conection {
 
     this.account = new Account(this.on_responses, this.send_request, server_url);
 
+    this.filters = new Filters(this.on_responses, this.send_request, server_url);
 
+    this.sync = new Sync(this.on_responses, this.send_request, server_url);
   }
 
   public static function make_request( method : String, url : String, data : Dynamic ) : HttpRequest {

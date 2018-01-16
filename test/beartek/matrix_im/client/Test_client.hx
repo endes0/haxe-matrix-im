@@ -15,6 +15,7 @@ class Test_client extends mohxa.Mohxa {
 
   var auth_data : {user: String, pass: String} = {user: 'test', pass: 'test'};
   var login_data : {acces_token: String, device_id: String, home_server: String, user_id: String};
+  var filter : String = '';
 
 
   public function new( server : String ) : Void {
@@ -30,7 +31,8 @@ class Test_client extends mohxa.Mohxa {
 
     this.test_server_adm();
     this.test_account();
-
+    this.test_filters();
+    this.test_sync();
 
     this.test_logout();
   }
@@ -105,6 +107,58 @@ class Test_client extends mohxa.Mohxa {
               a.make_pet();
             }
           });
+      });
+    });
+  }
+
+  public function test_sync() : Void {
+    this.describe('Probando sincronizacion', function() : Void {
+      this.it('Registrando handlers', function() : Void {
+        conection.sync.add_room_handler(function( rooms : Map<String,Joined_room> ) : Void {
+          this.log('This account groups: ');
+          for( room in rooms.keys() ) {
+            this.log('In ' + room);
+            this.log('Has ' + rooms[room].unread_notifications.notification_count + ' Unreaded notification');
+            this.log('Other data: ' + rooms[room]);
+          }
+        });
+
+        conection.sync.add_presence_handler(function( presence : Array<Event<Dynamic>> ) : Void {
+          this.log('Current presence events: ' + presence);
+        });
+
+        conection.sync.add_account_data_handler(function( account : Array<Event<Dynamic>> ) : Void {
+          this.log('Account data: ' + account);
+        });
+      });
+
+      this.it('Sincronizando', function() : Void {
+        conection.sync.sync(this.filter);
+      });
+    });
+  }
+
+  public function test_filters() : Void {
+    var room_filter : Room_filter = {
+      state: {limit: 5, types: ['m.room.*'],not_rooms: ['!726s6s6q:example.com'],contains_url : false},
+      timeline: {limit: 10, contains_url : false},
+      ephemeral: [{types: ['m.typing'], limit: 10, contains_url : false}],
+      account_data: {limit: 10, contains_url : false},
+      include_leave: false};
+    this.describe('Probando filtros', function() : Void {
+      this.it('Creando filtro', function() : Void {
+        conection.filters.add_filter(conection.session.user, {limit: 5, senders: [conection.session.user.toString(), '@this:atest.is']}, {limit: 5, senders: [conection.session.user, '@this:atest.is']}, room_filter, function( id : String ) : Void {
+          filter = id;
+          this.log('Filter id:' + filter);
+        });
+      });
+      this.it('obteniendo filtro', function() : Void {
+        conection.filters.get_filter(conection.session.user, filter, function( parts : Null<Array<String>>, presence: Filter, account : Filter, room: Room_filter ) : Void {
+          this.equal(presence.limit == 5, true);
+          this.equal(account.limit == 5, true);
+          this.equal(Std.string(room) == Std.string(room_filter), true);
+          this.equal(parts, null);
+        });
       });
     });
   }
