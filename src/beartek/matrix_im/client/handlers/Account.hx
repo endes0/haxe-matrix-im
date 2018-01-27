@@ -11,13 +11,10 @@ import beartek.matrix_im.client.types.replys.Threepid;
 import beartek.matrix_im.client.types.User;
 import beartek.matrix_im.client.auths.Auth;
 
-class Account {
-  var server : String;
+class Account extends Handler {
 
   public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
-    this.on_responses = on_responses;
-    this.send_request = send_request;
-    this.server = server;
+    super(on_responses, send_request, server);
   }
 
   public function register( kind : User_kind = User, username : String, password : String, bind_email : Bool, display_name : String = 'Matrix client on haxe', on_response : Login_data -> Void, on_stage : Auths -> Auth -> Void, ?stage_selector : Array<Array<Auths>> -> Int ) : Void {
@@ -146,13 +143,4 @@ class Account {
       return true;
     }
   }
-
-  dynamic function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void, ignore_errors : Bool = false ) : Void {
-    throw 'Handler created erroniusly';
-  }
-
-  dynamic function on_responses( status_code : Int, response : Dynamic, ignore_errors : Bool = false ) : Bool {
-    return true;
-  }
-
 }

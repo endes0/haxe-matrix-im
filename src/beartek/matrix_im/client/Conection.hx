@@ -13,6 +13,7 @@ class Conection {
   public var account : Account;
   public var filters : Filters;
   public var sync : Sync;
+  public var rooms : Rooms;
 
   public var server_url(default, null) : String;
   var responses_handlers : Map<Int,Array<Int -> Dynamic -> Bool>> = new Map();
@@ -30,6 +31,16 @@ class Conection {
     this.filters = new Filters(this.on_responses, this.send_request, server_url);
 
     this.sync = new Sync(this.on_responses, this.send_request, server_url);
+
+    this.rooms = new Rooms(this.on_responses, this.send_request, server_url);
+  }
+
+  public static function to_object_map<T>( o : Dynamic ) : Map<String,T> {
+    var result : Map<String,T> = new Map();
+    for( field in Reflect.fields(o) ) {
+      result.set(field,Reflect.field(o, field));
+    }
+    return result;
   }
 
   public static function make_request( method : String, url : String, data : Dynamic ) : HttpRequest {
@@ -91,7 +102,7 @@ class Conection {
     case 0:
       return false;
     case _:
-      this.on_fatal_error('Unexcepted status code recived');
+      this.on_fatal_error('Unexcepted status code recived: ' + status_code + ', error: ' + response);
       return false;
     }
   }

@@ -10,7 +10,9 @@ typedef Event<T> = {
   var type : Types;
   var origin_server_ts : Int;
   @:optional var state_key : String;
-  var unsigned : Unsigned<T>;
+  @:optional var unsigned : Unsigned<T>;
+  @:optional var prev_content : T;
+  @:optional var invite_room_state : Array<{content: T, state_key: String, type: Types}>;
 };
 
 typedef Unsigned<T> = {

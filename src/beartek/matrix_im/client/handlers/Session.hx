@@ -9,17 +9,13 @@ import beartek.matrix_im.client.types.replys.UIA;
 import beartek.matrix_im.client.types.replys.Login_data;
 import beartek.matrix_im.client.auths.Auth;
 
-class Session {
+class Session extends Handler {
   public var user : User;
   public var device : String;
   public var access_token : String;
 
-  var server : String;
-
   public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
-    this.on_responses = on_responses;
-    this.send_request = send_request;
-    this.server = server;
+    super(on_responses, send_request, server);
   }
 
   public function login_with_pass( user : String, password : String, display_name : String = 'Matrix client on haxe', on_response : Login_data -> Void ) : Void {
@@ -80,13 +76,5 @@ class Session {
         throw 'Invalid status code on logout';
       }
     });
-  }
-
-  dynamic function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void, ignore_errors : Bool = false ) : Void {
-    throw 'Handler created erroniusly';
-  }
-
-  dynamic function on_responses( status_code : Int, response : Dynamic, ignore_errors : Bool = false ) : Bool {
-    return true;
   }
 }

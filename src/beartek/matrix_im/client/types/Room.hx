@@ -15,7 +15,7 @@ abstract Room(Room_body) {
   }
 
   @:to public inline function toString() : String {
-    return '@' + this.name + ':' + this.server;
+    return '!' + this.name + ':' + this.server;
   }
 
   public inline function get_room() : String {
@@ -26,8 +26,8 @@ abstract Room(Room_body) {
     return this.server;
   }
 
-  public function equal( u : User ) : Bool {
-    if( this.name == u.get_user() && this.server == u.get_server() ) {
+  public function equal( u : Room ) : Bool {
+    if( this.name == u.get_room() && this.server == u.get_server() ) {
       return true;
     } else {
       return false;
@@ -35,7 +35,7 @@ abstract Room(Room_body) {
   }
 }
 
-typedef User_body = {
+typedef Room_body = {
   var name : String;
   var server : String;
 }

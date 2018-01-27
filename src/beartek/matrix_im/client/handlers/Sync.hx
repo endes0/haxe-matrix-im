@@ -10,8 +10,7 @@ import beartek.matrix_im.client.types.replys.Invited_room;
 import beartek.matrix_im.client.types.replys.Left_room;
 
 
-class Sync {
-  var server : String;
+class Sync extends Handler {
   var batch : Map<String,String> = new Map();
   var presence_handlers : Array<Array<Event<Dynamic>> -> Void> = [];
   var account_data_handlers : Array<Array<Event<Dynamic>> -> Void> = [];
@@ -20,9 +19,7 @@ class Sync {
   var leave_handlers : Array<Map<String,Left_room> -> Void> = [];
 
   public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
-    this.on_responses = on_responses;
-    this.send_request = send_request;
-    this.server = server;
+    super(on_responses, send_request, server);
   }
 
   public function sync( ?filter_id : String, ?filter : Dynamic, presence : Presence = Online, timeout : Int = 0, ?since : String, ?on_response : {next_bath : String, rooms : {join: Map<String,Joined_room>, invite: Map<String,Invited_room>, leave: Map<String,Left_room>}, presence : Array<Event<Dynamic>>, account_data : Array<Event<Dynamic>>} -> Void ) : Void {
@@ -95,28 +92,10 @@ class Sync {
   }
 
   private function on_sync(data : {next_bath : String, rooms: {join: Dynamic, invite: Dynamic, leave: Dynamic}, presence: {events: Array<Event<Dynamic>>}, account_data: {events: Array<Event<Dynamic>>}}) : {next_bath : String, rooms : {join: Map<String,Joined_room>, invite: Map<String,Invited_room>, leave: Map<String,Left_room>}, presence : Array<Event<Dynamic>>, account_data : Array<Event<Dynamic>>} {
-    var joined : Map<String,Joined_room> = new Map();
-    for( room in Reflect.fields(data.rooms.join) ) {
-      joined.set(room,Reflect.field(data.rooms.join, room));
-    }
-    var invited : Map<String,Invited_room> = new Map();
-    for( room in Reflect.fields(data.rooms.invite) ) {
-      invited.set(room,Reflect.field(data.rooms.invite, room));
-    }
-    var leave : Map<String,Left_room> = new Map();
-    for( room in Reflect.fields(data.rooms.leave) ) {
-      leave.set(room,Reflect.field(data.rooms.invite, room));
-    }
+    var joined : Map<String,Joined_room> = Conection.to_object_map(data.rooms.join);
+    var invited : Map<String,Invited_room> = Conection.to_object_map(data.rooms.invite);
+    var leave : Map<String,Left_room> = Conection.to_object_map(data.rooms.leave);
 
     return {next_bath: data.next_bath, rooms: {join: joined, invite: invited, leave: leave}, presence: data.presence.events,account_data: data.account_data.events};
   }
-
-  dynamic function send_request( request : HttpRequest, on_response : Int -> Dynamic -> Void, ignore_errors : Bool = false ) : Void {
-    throw 'Handler created erroniusly';
-  }
-
-  dynamic function on_responses( status_code : Int, response : Dynamic, ignore_errors : Bool = false ) : Bool {
-    return true;
-  }
-
 }
