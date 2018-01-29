@@ -1,7 +1,7 @@
 {
     "name": "matrix-im",
     "url" : "https://notabug.org/Tamaimo/haxe-matrix-im",
-    "tags": ["matrix", "im", "client-server", "API"],
+    "tags": ["matrix", "chat", "im", "client-server", "API"],
     "license": "GPL",
     "releasenote": "Alpha release",
     "description": "Implementation of client-server matrix API in haxe using HaxeHttpClient.",
@@ -9,6 +9,6 @@
     "classPath": "src/",
     "contributors": ["endes"],
     "dependencies": {
-      "https-client" : "0.1.0"
+      "akifox-asynchttp" : "0.4.7"
     }
 }
