@@ -17,6 +17,7 @@ class Test_client extends mohxa.Mohxa {
   var filter : String = '';
   var room : Room;
   var message_id : String = '';
+  var u_name : String = '';
 
 
   public function new( server : String ) : Void {
@@ -35,6 +36,7 @@ class Test_client extends mohxa.Mohxa {
     this.test_filters();
     this.test_sync();
     this.test_room();
+    this.test_profile();
 
     this.test_logout();
   }
@@ -115,12 +117,29 @@ class Test_client extends mohxa.Mohxa {
 
   public function test_room() : Void {
     this.describe('Room', function() : Void {
+      this.it('Listing publics rooms', function() : Void {
+        conection.rooms.list_public(10, function( l : Array<Dynamic>, n : String, p : String, total : Int ) : Void {
+          this.equal(l.length < 10, true);
+          this.log('Rooms: ' + l);
+        });
+      });
+
       this.it('Creating room', function() : Void {
         conection.rooms.create(Private, 'a_test_room_' + Std.random(10000), 'A test Room', 'test', Private_chat, function( r : Room ) : Void {
           this.room = r;
         });
       });
 
+      this.it('Gettion list of rooms(min 1)', function() : Void {
+        conection.rooms.list(function( l : Array<Room> ) : Void {
+          this.equal(l.length > 0, true);
+          var found : Bool = false;
+          for( r in l ) {
+            found == r.equal(this.room);
+          }
+          this.equal(found, true);
+        });
+      });
 
       this.it('Getting events for a room (except messages)', function() : Void {
         this.log('Getting state content events');
@@ -180,17 +199,69 @@ class Test_client extends mohxa.Mohxa {
           this.log('Added alias to the room');
         });
 
-        this.conection.rooms.get_room_from_alias('Test_alias_room', conection.session.user.get_server(), function ( r : Room, servers: Array<String> ) : Void {
+        this.conection.rooms.get_room_from_alias('Test_alias_room', this.room.get_server(), function ( r : Room, servers: Array<String> ) : Void {
           this.log('Obtained room from alias');
           this.equal(r.equal(this.room), true);
           this.equal(servers[0], conection.session.user.get_server());
         });
 
-        this.conection.rooms.remove_alias('Test_alias_room', conection.session.user.get_server(), function() : Void {
+        this.conection.rooms.remove_alias('Test_alias_room', this.room.get_server(), function() : Void {
           this.log('Alias removed');
         });
       });
 
+      this.it('Inviting to room', function() : Void {
+        conection.rooms.invite(this.room, new User('@test:test.is'), function() : Void {
+          this.log('Invited');
+        });
+      });
+
+      this.it('Banning from room', function() : Void {
+        conection.rooms.ban(this.room, new User('@test:test.is'), 'Too hard', function() : Void {
+          this.log('Banned');
+        });
+      });
+
+      this.it('leaving from room', function() : Void {
+        conection.rooms.leave(this.room, function() : Void {
+          this.log('Leaved');
+        });
+      });
+
+      this.it('forgetting the room', function() : Void {
+        conection.rooms.forget(this.room, function() : Void {
+          conection.rooms.list(function( l : Array<Room> ) : Void {
+            var found : Bool = false;
+            for( r in l ) {
+              if( r.equal(this.room) ) {
+                found == true;
+              }
+            }
+            this.equal(found, false);
+          });
+        });
+      });
+    });
+  }
+
+  public function test_profile() : Void {
+    this.describe('Profile', function() : Void {
+      this.it('Getting full profile', function() : Void {
+        conection.profile.get_profile(conection.session.user, function( name : String, avatar : String ) : Void {
+          this.log('Name: ' + name);
+          this.log('Avatar: ' + avatar);
+        });
+      });
+
+      this.it('Changin name', function() : Void {
+        conection.profile.set_displayname('Test', conection.session.user, function() : Void {
+          conection.profile.get_displayname(conection.session.user, function( name : String) : Void {
+            this.equal(name, this.u_name);
+            this.log('Changed');
+            conection.profile.set_displayname('Test', conection.session.user, null);
+          });
+        });
+      });
     });
   }
 
