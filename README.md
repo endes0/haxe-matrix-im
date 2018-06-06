@@ -17,14 +17,14 @@ con.on_error = function( e : Dynamic ) : Void {
 }
 
 con.session.login_with_pass(user, password, device_name, function( respose : Dynamic ) : Void {
-  trace(respose.access_token); //The access_token will be actumaticaly stored for duture request until you logout.
+  trace(respose.access_token); //The access_token will be actumaticaly stored for future request until you logout.
 });
 ```
 
 Log out:
 ```haxe
 con.session.logout(function() : Void {
-  //Logued out
+  //Loged out
 });
 ```
 

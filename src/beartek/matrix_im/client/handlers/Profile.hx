@@ -25,13 +25,13 @@ class Profile extends Handler {
   }
 
   public inline function set_avatar( url : String, user : User, on_response : Void -> Void ) : Void {
-    this.send_request(Conection.make_request('PUT', this.server + '/_matrix/client/r0/profile/' + user + '/displayname', {avatar_url: url}), function( status : Int, data : Dynamic ) : Void {
+    this.send_request(Conection.make_request('PUT', this.server + '/_matrix/client/r0/profile/' + user + '/avatar_url', {avatar_url: url}), function( status : Int, data : Dynamic ) : Void {
       on_response();
     });
   }
 
   public inline function get_avatar( user : User, on_response : String -> Void ) : Void {
-    this.send_request(Conection.make_request('GET', this.server + '/_matrix/client/r0/profile/' + user + '/displayname', null), function( status : Int, data : Dynamic ) : Void {
+    this.send_request(Conection.make_request('GET', this.server + '/_matrix/client/r0/profile/' + user + '/avatar_url', null), function( status : Int, data : Dynamic ) : Void {
       on_response(data.avatar_url);
     });
   }

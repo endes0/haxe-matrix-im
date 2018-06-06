@@ -17,10 +17,6 @@ class Rooms extends Handler {
 
   public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
     super(on_responses, send_request, server);
-
-    this.list(function( rooms : Array<Room> ) : Void {
-      this.joined_rooms = rooms;
-    });
   }
 
   public inline function create( ?visibility : Visibilities, ?alias : String, ?name : String, ?topic : String, ?invite : Array<String>, ?invite_3pid : Array<{id_server : String, medium : String, address: String}>, ?creation_content: Dynamic, ?initial_state : Array<{type: String, state_key: String, content: String}>, ?preset : Room_preset, is_direct : Bool = false, on_response : Room -> Void ) : Void {
@@ -82,9 +78,16 @@ class Rooms extends Handler {
     });
   }
 
+
   public inline function list( on_response : Array<Room> -> Void ) : Void {
     this.send_request(Conection.make_request('GET', this.server + '/_matrix/client/r0/joined_rooms', null), function( status : Int, data : {joined_rooms: Array<String>} ) : Void {
       on_response(data.joined_rooms.map(Room.new));
+    });
+  }
+
+  public inline function update_joined_room() {
+    this.list(function( rooms : Array<Room> ) : Void {
+      this.joined_rooms = rooms;
     });
   }
 

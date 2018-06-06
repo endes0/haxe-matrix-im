@@ -12,10 +12,25 @@ import beartek.matrix_im.client.auths.Auth;
 class Session extends Handler {
   public var user : User;
   public var device : String;
-  public var access_token : String;
+  public var access_token(default, set) : String;
+  var open_handlers : Array<String -> Void> = [];
+
+  function set_access_token(token:String): String {
+    this.access_token = token;
+
+    for (func in open_handlers) {
+      func(token);
+    }
+
+    return token;
+  }
 
   public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
     super(on_responses, send_request, server);
+  }
+
+  public function onopen(func: String -> Void) {
+    open_handlers.push(func);
   }
 
   public function login_with_pass( user : String, password : String, display_name : String = 'Matrix client on haxe', on_response : Login_data -> Void ) : Void {
@@ -58,11 +73,11 @@ class Session extends Handler {
     return server + '/_matrix/static/client/login/';
   }
 
-  public function fallback_handler( response : Login_data, on_response : Login_data -> Void ) : Void {
+  public function fallback_handler( response : Login_data, ?on_response : Login_data -> Void ) : Void {
     this.access_token = response.access_token;
     this.device = response.device_id;
     this.user = new User(response.user_id);
-    on_response(response);
+    if(on_response != null) on_response(response);
   }
 
   public function logout( on_logout : Void -> Void ) : Void {

@@ -12,6 +12,9 @@ import beartek.matrix_im.client.types.User;
 import beartek.matrix_im.client.auths.Auth;
 
 class Account extends Handler {
+  public dynamic function on_login_data(data: Login_data) {
+    trace('This function must be repalced');
+  }
 
   public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
     super(on_responses, send_request, server);
@@ -23,6 +26,10 @@ class Account extends Handler {
     }
 
     var request = {bind_email: bind_email, username: username, password: password, display_name : display_name};
+    var fallback = function(l: Login_data) {
+      on_login_data(l);
+      on_response(l);
+    };
 
     this.send_request(Conection.make_request('POST', server + '/_matrix/client/r0/register?kind=' + kind, request), function( status : Int, response : Dynamic ) : Void {
       if( Check_reply.is_UIA(response) ) {
@@ -35,8 +42,7 @@ class Account extends Handler {
           data.select_flow(UIA.fast_flow(data.get()));
         }
 
-        //TODO: anadir login_data a session
-        data.start(on_stage, on_response, request, this.send_request);
+        data.start(on_stage, fallback, request, this.send_request);
       } else {
         throw 'Error on trying UIA: ' + response;
       }

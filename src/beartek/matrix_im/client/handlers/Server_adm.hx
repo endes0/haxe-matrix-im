@@ -20,8 +20,15 @@ class Server_adm extends Handler {
       var result : Array<Version> = data.versions.map(Version.new);
       this.versions = result;
 
-      if( result.indexOf(new Version('r0.3.0')) == -1 ) {
-        trace( 'Warning: Incompatible server version' );
+      var version = new Version('r0.3.0');
+      var support = false;
+      for(v in result) {
+        if(version.equal(v)) {
+          support = true;
+        }
+      }
+      if(!support) {
+        trace('Warning: Incompatible server version');
       }
 
       if( on_response != null ) {

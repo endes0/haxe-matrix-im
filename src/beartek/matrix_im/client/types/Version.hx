@@ -14,6 +14,10 @@ abstract Version(Ver) {
     return 'r' + this.x + '.' + this.y + '.' + this.z;
   }
 
+  public inline function equal(other: Version) : Bool {
+    return this.x == other.get_x() && this.y == other.get_y() && this.z == other.get_z();
+  }
+
   public inline function get_x() : Int {
     return this.x;
   }

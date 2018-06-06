@@ -5,7 +5,7 @@ import com.akifox.asynchttp.*;
 import beartek.matrix_im.client.handlers.*;
 import beartek.matrix_im.client.Check_reply;
 import beartek.matrix_im.client.types.replys.Error;
-
+import beartek.matrix_im.client.types.replys.Login_data;
 
 class Conection {
   public var server : Server_adm;
@@ -28,12 +28,18 @@ class Conection {
     this.server.get_versions();
 
     this.account = new Account(this.on_responses, this.send_request, server_url);
+    this.account.on_login_data = function(l: Login_data) {
+      this.session.fallback_handler(l)
+    }
 
     this.filters = new Filters(this.on_responses, this.send_request, server_url);
 
     this.sync = new Sync(this.on_responses, this.send_request, server_url);
 
     this.rooms = new Rooms(this.on_responses, this.send_request, server_url);
+    this.session.onopen(function (t:String) {
+      this.rooms.update_joined_room();
+    });
 
     this.profile = new Profile(this.on_responses, this.send_request, server_url);
   }
