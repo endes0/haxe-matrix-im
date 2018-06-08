@@ -1,7 +1,7 @@
 # haxe-matrix-im
 
 Implementation of client-server matrix API in haxe using akifox-asynchttp. Because of it, tecnically only works on **CPP/NEKO/JAVA/FLASH** and not in **JAVASCRIPT**
-because **JAVASCRIPT** only support *POST and Get* Methods. But, is only tested on neko Platform, if you test in other, let me know.
+because **JAVASCRIPT** only support *POST and Get* Methods. But, is only tested on neko platform, if you test in other, let me know.
 
 ## Usage
 Importing:
