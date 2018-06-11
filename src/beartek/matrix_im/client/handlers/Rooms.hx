@@ -140,6 +140,41 @@ class Rooms extends Handler {
     });
   }
 
+  public inline function get_display_names(members: Map<String,{display_name: String, avatar_url: String}>): Map<String,{id: User, avatar_url: String}> {
+    var result: Map<String,{id: User, avatar_url: String}> = new Map();
+
+    for(id in members.keys()) {
+     result = check_name_collision(result, {id: new User(id), display_name: members[id].display_name, avatar_url: members[id].avatar_url});
+    };
+
+    return result;
+  }
+
+  public inline function get_display_names_events(events: Array<Event<m.room.Member>>): Map<String,{id: User, avatar_url: String}> {
+    //TODO: memberships and is_direct
+    var result: Map<String,{id: User, avatar_url: String}> = new Map();
+
+    for(e in events) {
+     result = check_name_collision(result, {id: new User(e.state_key), display_name: e.content.displayname, avatar_url: e.content.avatar_url});
+    };
+
+    return result;
+  }
+
+  public function check_name_collision(members: Map<String,{id: User, avatar_url: String}>, new_member: {id: User, display_name: String, avatar_url: String}): Map<String,{id: User, avatar_url: String}> {
+    //TODO: This algo only works on pairs numbers of collisions
+    if(new_member.display_name != null) {
+      if(members[new_member.display_name] != null) {
+      members[new_member.display_name + ' (' + members[new_member.display_name].id + ')'] = members[new_member.display_name];
+      members[new_member.display_name + ' (' + new_member.id + ')'] = {id: new_member.id, avatar_url: new_member.avatar_url};
+      members[new_member.display_name] = null;
+      }
+    } else {
+      members[new_member.id] = {id: new_member.id, avatar_url: new_member.avatar_url};
+    }
+    return members;
+  }
+
   public inline function get_messages( room : Room, from : String, ?to : String, dir : Directions, limit : Int = 10, ?filter : Dynamic, on_response : Array<Event<Dynamic>> -> Void ) : Void {
     this.send_request(Conection.make_request('GET', server + '/_matrix/client/r0/rooms/' + room + '/messages', {from: from, to: to, dir: dir, limit: limit, filter: filter}), function( status : Int, data : Dynamic ) : Void {
       on_response(data.chunk);
