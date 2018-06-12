@@ -4,7 +4,7 @@ package beartek.matrix_im.client.handlers;
 import com.akifox.asynchttp.HttpRequest;
 import com.akifox.asynchttp.HttpMethod;
 import beartek.matrix_im.client.types.Event;
-import beartek.matrix_im.client.types.enums.Presence;
+import beartek.matrix_im.client.types.enums.Presences;
 import beartek.matrix_im.client.types.replys.Joined_room;
 import beartek.matrix_im.client.types.replys.Invited_room;
 import beartek.matrix_im.client.types.replys.Left_room;
@@ -22,7 +22,7 @@ class Sync extends Handler {
     super(on_responses, send_request, server);
   }
 
-  public function sync( ?filter_id : String, ?filter : Dynamic, presence : Presence = Online, timeout : Int = 0, ?since : String, ?on_response : {next_bath : String, rooms : {join: Map<String,Joined_room>, invite: Map<String,Invited_room>, leave: Map<String,Left_room>}, presence : Array<Event<Dynamic>>, account_data : Array<Event<Dynamic>>} -> Void ) : Void {
+  public function sync( ?filter_id : String, ?filter : Dynamic, presence : Presences = Online, timeout : Int = 0, ?since : String, ?on_response : {next_bath : String, rooms : {join: Map<String,Joined_room>, invite: Map<String,Invited_room>, leave: Map<String,Left_room>}, presence : Array<Event<Dynamic>>, account_data : Array<Event<Dynamic>>} -> Void ) : Void {
     var req = Conection.make_request('GET', server + '/_matrix/client/r0/sync?filter=' + (if(filter) filter else filter_id) +
           (if(since != null || this.batch.exists(filter_id)) '&since=' + if(since != null) since else this.batch[filter_id] else '') +
           '&set_presence=' + presence
@@ -39,7 +39,7 @@ class Sync extends Handler {
     });
   }
 
-  public function sync_full_state( ?filter_id : String, ?filter : Dynamic, presence : Presence = Online, ?on_response : {next_bath : String, rooms : {join: Map<String,Joined_room>, invite: Map<String,Invited_room>, leave: Map<String,Left_room>}, presence : Array<Event<Dynamic>>, account_data : Array<Event<Dynamic>>} -> Void ) : Void {
+  public function sync_full_state( ?filter_id : String, ?filter : Dynamic, presence : Presences = Online, ?on_response : {next_bath : String, rooms : {join: Map<String,Joined_room>, invite: Map<String,Invited_room>, leave: Map<String,Left_room>}, presence : Array<Event<Dynamic>>, account_data : Array<Event<Dynamic>>} -> Void ) : Void {
     var req = Conection.make_request('GET', server + '/_matrix/client/r0/sync?filter=' + (if(filter) filter else filter_id)
           + '&set_presence=' + presence, null);
     this.send_request(req, function( status : Int, data : Dynamic ) : Void {
