@@ -14,6 +14,7 @@ import beartek.matrix_im.client.types.enums.Directions;
 
 class Rooms extends Handler {
   public var joined_rooms : Array<Room>;
+  public var typing_on: Map<Room, Bool>;
 
   public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
     super(on_responses, send_request, server);
@@ -33,6 +34,27 @@ class Rooms extends Handler {
 
     this.send_request(Conection.make_request('POST', server + '/_matrix/client/r0/createRoom', req), function( status : Int, data : Dynamic ) : Void {
       on_response(new Room(data.room_id));
+    });
+  }
+
+  public inline function typing(room : Room, user : User, timeout=3000, stop=false, on_response : Bool -> Void) {
+     this.send_request(Conection.make_request('PUT', this.server + '/_matrix/client/r0/rooms/' + room + '/typing/' + user, {typing: if(stop) false else true, timeout: timeout}), function( status : Int, data : Dynamic ) : Void {
+      on_response(if(stop) false else true);
+    });
+  }
+
+  public function check_typing(time: int, user: User) {
+    for(room in typing_on.keys()) {
+      if(typing_on[room] == true) {
+        this.typing(room, user, time + 200);
+      } else if(typing_on[room] == false) {
+        this.typing(room, user, time, true);
+        typing_on[room] == null;
+      }
+    }
+
+    haxe.Timer.delay(time, function (){
+      check_typing(time, user);
     });
   }
 
