@@ -74,9 +74,9 @@ class Session extends Handler {
   }
 
   public function fallback_handler( response : Login_data, ?on_response : Login_data -> Void ) : Void {
-    this.access_token = response.access_token;
     this.device = response.device_id;
     this.user = new User(response.user_id);
+    this.access_token = response.access_token;
     if(on_response != null) on_response(response);
   }
 

@@ -43,6 +43,10 @@ class Conection {
     });
 
     this.profile = new Profile(this.on_responses, this.send_request, server_url);
+
+    this.profile = new Voip(this.on_responses, this.send_request, server_url);
+
+    this.profile = new Receipt(this.on_responses, this.send_request, server_url);
   }
 
   public static function to_object_map<T>( o : Dynamic ) : Map<String,T> {
