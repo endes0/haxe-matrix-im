@@ -43,7 +43,7 @@ class Rooms extends Handler {
     });
   }
 
-  public function check_typing(time: int, user: User) {
+  public function check_typing(time: Int, user: User) {
     for(room in typing_on.keys()) {
       if(typing_on[room] == true) {
         this.typing(room, user, time + 200);

@@ -41,10 +41,6 @@ class Conection {
     this.sync = new Sync(this.on_responses, this.send_request, server_url);
 
     this.rooms = new Rooms(this.on_responses, this.send_request, server_url);
-    this.session.onopen(function (t:String) {
-      this.rooms.update_joined_room();
-      this.rooms.check_typing(2500, this.session.user);
-    });
 
     this.profile = new Profile(this.on_responses, this.send_request, server_url);
 
@@ -53,6 +49,13 @@ class Conection {
     this.receipt = new Receipt(this.on_responses, this.send_request, server_url);
 
     this.presence = new Presence(this.on_responses, this.send_request, server_url);
+
+    this.session.onopen(function (t:String) {
+      this.rooms.update_joined_room();
+      this.rooms.check_typing(2500, this.session.user);
+      this.presence.user = this.session.user;
+      this.presence.update_list(this.session.user, 30000);
+    });
   }
 
   public static function to_object_map<T>( o : Dynamic ) : Map<String,T> {
