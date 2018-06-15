@@ -17,6 +17,7 @@ class Conection {
   public var profile : Profile;
   public var voip : Voip;
   public var receipt : Receipt;
+  public var presence : Presence;
 
 
   public var server_url(default, null) : String;
@@ -50,6 +51,8 @@ class Conection {
     this.voip = new Voip(this.on_responses, this.send_request, server_url);
 
     this.receipt = new Receipt(this.on_responses, this.send_request, server_url);
+
+    this.presence = new Presence(this.on_responses, this.send_request, server_url);
   }
 
   public static function to_object_map<T>( o : Dynamic ) : Map<String,T> {
