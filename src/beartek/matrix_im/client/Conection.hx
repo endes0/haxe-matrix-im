@@ -15,6 +15,9 @@ class Conection {
   public var sync : Sync;
   public var rooms : Rooms;
   public var profile : Profile;
+  public var voip : Voip;
+  public var receipt : Receipt;
+
 
   public var server_url(default, null) : String;
   var responses_handlers : Map<Int,Array<Int -> Dynamic -> Bool>> = new Map();
@@ -44,9 +47,9 @@ class Conection {
 
     this.profile = new Profile(this.on_responses, this.send_request, server_url);
 
-    this.profile = new Voip(this.on_responses, this.send_request, server_url);
+    this.voip = new Voip(this.on_responses, this.send_request, server_url);
 
-    this.profile = new Receipt(this.on_responses, this.send_request, server_url);
+    this.receipt = new Receipt(this.on_responses, this.send_request, server_url);
   }
 
   public static function to_object_map<T>( o : Dynamic ) : Map<String,T> {
