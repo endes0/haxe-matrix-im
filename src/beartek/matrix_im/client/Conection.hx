@@ -18,6 +18,7 @@ class Conection {
   public var voip : Voip;
   public var receipt : Receipt;
   public var presence : Presence;
+  public var content : Content;
 
 
   public var server_url(default, null) : String;
@@ -49,6 +50,9 @@ class Conection {
     this.receipt = new Receipt(this.on_responses, this.send_request, server_url);
 
     this.presence = new Presence(this.on_responses, this.send_request, server_url);
+
+    this.content = new Content(this.on_responses, this.send_request, server_url);
+
 
     this.session.onopen(function (t:String) {
       this.rooms.update_joined_room();
