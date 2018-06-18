@@ -9,6 +9,7 @@ import beartek.matrix_im.client.types.replys.Login_data;
 import beartek.matrix_im.client.types.replys.UIA;
 import beartek.matrix_im.client.types.replys.Threepid;
 import beartek.matrix_im.client.types.User;
+import beartek.matrix_im.client.types.Device;
 import beartek.matrix_im.client.auths.Auth;
 
 class Account extends Handler {
@@ -87,6 +88,44 @@ class Account extends Handler {
       if( Check_reply.is_UIA(response) ) {
         var data : UIA = new UIA(response);
         var request = Conection.make_request('POST', server + '/_matrix/client/r0/account/deactivate', {});
+
+        if( stage_selector != null ) {
+          data.select_flow(stage_selector(data.get_flows()));
+        } else {
+          data.select_flow(UIA.fast_flow(data.get()));
+        }
+
+        data.start(on_stage, on_response, request, this.send_request);
+      } else {
+        throw 'Error on trying UIA';
+      }
+    }, true);
+  }
+
+
+  public function get_devices( on_response : Array<Device> -> Void ) : Void {
+    this.send_request(Conection.make_request('GET', server + '/_matrix/client/r0/devices', null), function( status : Int, data : {devices: Array<Device>} ) : Void {
+      on_response(data.devices);
+    });
+  }
+
+  public function get_device(id: String, on_response : Device -> Void) : Void {
+    this.send_request(Conection.make_request('GET', server + '/_matrix/client/r0/devices/' + id, null), function( status : Int, data : Device ) : Void {
+      on_response(data);
+    });
+  }
+
+  public function set_device_name(id: String, name: String, on_response : Void -> Void) : Void {
+    this.send_request(Conection.make_request('PUT', server + '/_matrix/client/r0/devices/' + id, {display_name: name}), function( status : Int, data : Dynamic ) : Void {
+      on_response();
+    });
+  }
+
+  public function delete_device( id: String, on_response : Null<Dynamic> -> Void, on_stage : Auths -> Auth -> Void, ?stage_selector : Array<Array<Auths>> -> Int ) : Void {
+    this.send_request(Conection.make_request('DELETE', server + '/_matrix/client/r0/devices/' + id, null), function( status : Int, response : Dynamic ) : Void {
+      if( Check_reply.is_UIA(response) ) {
+        var data : UIA = new UIA(response);
+        var request = Conection.make_request('DELETE', server + '/_matrix/client/r0/devices/' + id, {});
 
         if( stage_selector != null ) {
           data.select_flow(stage_selector(data.get_flows()));
