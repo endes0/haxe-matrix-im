@@ -46,16 +46,16 @@ class Rooms extends Handler {
   public function check_typing(time: Int, user: User) {
     for(room in typing_on.keys()) {
       if(typing_on[room] == true) {
-        this.typing(room, user, time + 200);
+        this.typing(room, user, time + 200, function(t:Bool) {});
       } else if(typing_on[room] == false) {
-        this.typing(room, user, time, true);
+        this.typing(room, user, time, true, function(t:Bool) {});
         typing_on[room] == null;
       }
     }
 
-    haxe.Timer.delay(time, function (){
+    haxe.Timer.delay(function (){
       check_typing(time, user);
-    });
+    }, time);
   }
 
   public inline function invite( room : Room, user : User, on_response : Void -> Void ) : Void {
@@ -150,6 +150,12 @@ class Rooms extends Handler {
     this.get_room_events('/_matrix/client/r0/rooms/' + room + '/state', on_response);
   }
 
+  public inline function get_events( room : Room, ?from_token: String, ?timeout: Int, on_response : String -> String -> Array<Event<Dynamic>> -> Void ) : Void {
+    this.send_request(Conection.make_request('GET', server + '/_matrix/client/r0/events?room_id=' + room + (if(timeout != null) '&timeout=' + timeout else '') + (if(from_token != null) '&from=' + from_token else ''), null),
+     function( status : Int, data : {start: String, end: String, chunk: Array<Event<Dynamic>>} ) : Void {
+      on_response(data.start, data.end, data.chunk);
+    });
+  }
   public inline function get_members( room : Room, on_response : Array<Event<m.room.Member>> -> Void ) : Void {
     this.send_request(Conection.make_request('GET', server + '/_matrix/client/r0/rooms/' + room + '/members', null), function( status : Int, data : Dynamic ) : Void {
       on_response(data.chunk);
