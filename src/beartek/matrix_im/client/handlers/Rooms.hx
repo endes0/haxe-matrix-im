@@ -64,6 +64,12 @@ class Rooms extends Handler {
     });
   }
 
+  public inline function third_invite( room : Room, identity_server : String, address: String, medium: String = 'email', on_response : Void -> Void ) : Void {
+    this.send_request(Conection.make_request('POST', this.server + '/_matrix/client/r0/rooms/' + room + '/invite', {id_server: identity_server, address: address, medium: medium}), function( status : Int, data : Dynamic ) : Void {
+      on_response();
+    });
+  }
+
   public inline function join( room : Room, ?third_party_signed : {sender: String, mxid: String, token: String, signatures: Dynamic}, on_response : Room -> Void ) : Void {
     this.send_request(Conection.make_request('POST', this.server + '/_matrix/client/r0/rooms/' + room + '/join', if(third_party_signed != null) {third_party_signed: third_party_signed} else null), function( status : Int, data : Dynamic ) : Void {
       on_response(new Room(data.room_id));

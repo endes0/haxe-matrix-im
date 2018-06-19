@@ -31,7 +31,7 @@ con.session.logout(function() : Void {
 For more examples see the `Test_client` class in *test/beartek/matrix_im/client* and for more info see [Matrix Client-Server API docs](https://matrix.org/docs/spec/client_server/r0.3.0.html) (This library does not implement the API equal than described in the matrix docs).
 
 ## TODO
-- Implement [modules](https://matrix.org/docs/spec/client_server/r0.3.0.html#modules).
+- Implement some [modules](https://matrix.org/docs/spec/client_server/r0.3.0.html#modules): Push Notifications, End-to-End Encryption, Send-to-Device messaging, Server Side Search, Event Context and CAS-based client login.
 - Add documetation to the class, types and functions.
 - Make better README.
 
