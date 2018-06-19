@@ -25,8 +25,8 @@ abstract Room(Room_body) {
       return canocial_alias.content.alias;
     } else {
       if(members != null) {
-        var name1: String;
-        var name2: String;
+        var name1: String = '';
+        var name2: String = '';
         var more = false;
         for(m in members.keys()) {
           if(name1 == null) {

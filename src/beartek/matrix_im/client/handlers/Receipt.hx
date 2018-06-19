@@ -17,6 +17,7 @@ class Receipt extends Handler {
   public function send_read(room: Room, event: String, ?on_response: Void -> Void) : Void {
     this.send_request(Conection.make_request(HttpMethod.POST, server + '/_matrix/client/r0/rooms/' + room + '/receipt/m.read/' + event, null), function ( status : Int, data: Dynamic ) : Void {
       on_response();
+    });
   }
 
   public function get_receipt_event(event: Event<Dynamic>): Event<Receipt_event> {

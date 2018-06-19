@@ -14,12 +14,13 @@ class Voip extends Handler {
   public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
     super(on_responses, send_request, server);
 
-    this.update_turn()
+    this.update_turn();
   }
 
   public function get_turn_servers(?on_response: Turn_Servers -> Void) : Void {
     this.send_request(Conection.make_request(HttpMethod.GET, server + '/_matrix/client/r0/voip/turnServer', null), function ( status : Int, data: Turn_Servers ) : Void {
       on_response(data);
+    });
   }
 
   public function accept_call(call_id: String, other_call_id: String): Bool {

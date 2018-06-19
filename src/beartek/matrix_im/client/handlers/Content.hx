@@ -18,16 +18,16 @@ class Content extends Handler {
       url: server + '/_matrix/media/r0/upload?filename=' + filename,
       method: HttpMethod.POST,
       contentType: mimetype,
-      content: content.getString(0, content.length);
+      content: content.getString(0, content.length)
     });
     this.send_request(request, function ( status : Int, data: {content_uri: String} ) : Void {
-      on_response(new Content_uri(content_uri));
-    }
+      on_response(new Content_uri(data.content_uri));
+    });
   }
 
   public function download(content_uri: Content_uri, ?on_response: String -> String -> haxe.io.Bytes -> Void) : Void {
     var request = new HttpRequest({
-      url: server + '/_matrix/media/r0/download/' + content_uri.get_server() + '/' content_uri.get_media_id(),
+      url: server + '/_matrix/media/r0/download/' + content_uri.get_server() + '/' + content_uri.get_media_id(),
       method: HttpMethod.GET
     });
 
@@ -66,6 +66,7 @@ class Content extends Handler {
   public function preview_url(url: String, time: Int, ?on_response: Map<String, String> -> Void) : Void {
     this.send_request(Conection.make_request(HttpMethod.GET, server + '/_matrix/media/r0/preview_url?url=' + url + '&ts=' + time, null), function ( status : Int, data: Dynamic ) : Void {
       on_response(Conection.to_object_map(data));
+    });
   }
 
 }

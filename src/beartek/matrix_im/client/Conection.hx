@@ -34,7 +34,7 @@ class Conection {
 
     this.account = new Account(this.on_responses, this.send_request, server_url);
     this.account.on_login_data = function(l: Login_data) {
-      this.session.fallback_handler(l)
+      this.session.fallback_handler(l);
     }
 
     this.filters = new Filters(this.on_responses, this.send_request, server_url);
