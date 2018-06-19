@@ -9,6 +9,7 @@ import beartek.matrix_im.client.types.replys.Login_data;
 import beartek.matrix_im.client.types.replys.UIA;
 import beartek.matrix_im.client.types.replys.Threepid;
 import beartek.matrix_im.client.types.User;
+import beartek.matrix_im.client.types.Room;
 import beartek.matrix_im.client.types.Device;
 import beartek.matrix_im.client.auths.Auth;
 
@@ -155,6 +156,18 @@ class Account extends Handler {
 
   public function validate_added_email( ?id_server : String, email : String, attemp : Int = 1, ?secret : String, on_response : Void -> Void ) : Void {
     this.email_token(id_server, email, attemp, secret, on_response, '/_matrix/client/r0/account/3pid/email/requestToken');
+  }
+
+  public function add_data( user : User, type : String, data: Dynamic, on_response : Void -> Void ) : Void {
+    this.send_request(Conection.make_request('PUT', server + '/_matrix/client/r0/user/' + user + '/account_data/' + type, data), function( status : Int, data : Dynamic ) : Void {
+      on_response();
+    });
+  }
+
+  public function add_room_data( user : User, room: Room, type : String, data: Dynamic, on_response : Void -> Void ) : Void {
+    this.send_request(Conection.make_request('PUT', server + '/_matrix/client/r0/user/' + user + '/rooms/' + room + '/account_data/' + type, data), function( status : Int, data : Dynamic ) : Void {
+      on_response();
+    });
   }
 
   public function whoami( on_response : User -> Void ) : Void {

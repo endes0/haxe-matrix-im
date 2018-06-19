@@ -234,6 +234,29 @@ class Rooms extends Handler {
     });
   }
 
+
+  public inline function get_tags( room : Room, user: User, on_response : Array<m.Tag> -> Void ) : Void {
+    this.send_request(Conection.make_request('GET', server + '/_matrix/client/r0/user/' + user + '/rooms/' + room + '/tags', null), function( status : Int, data : {tags: Array<Dynamic>} ) : Void {
+      var result: Array<m.Tag> = [];
+      for(t in data.tags) {
+        result.push({tags: Conection.to_object_map(t)});
+      }
+      on_response(result);
+    });
+  }
+
+  public inline function add_tag( room : Room, user: User, tag: String, order: Int, on_response : Void -> Void ) : Void {
+    this.send_request(Conection.make_request('PUT', server + '/_matrix/client/r0/user/' + user + '/rooms/' + room + '/tags/' + tag, {order: order}), function( status : Int, data : Dynamic ) : Void {
+      on_response();
+    });
+  }
+
+  public inline function remove_tag( room : Room, user: User, tag: String, on_response : Void -> Void ) : Void {
+    this.send_request(Conection.make_request('DELETE', server + '/_matrix/client/r0/user/' + user + '/rooms/' + room + '/tags/' + tag, null), function( status : Int, data : Dynamic ) : Void {
+      on_response();
+    });
+  }
+
   private function get_room_events( url : String, on_response : Array<Event<Dynamic>> -> Void ) : Void {
     this.send_request(Conection.make_request('GET', server + url, null), function( status : Int, data : Dynamic ) : Void {
       on_response(data);
