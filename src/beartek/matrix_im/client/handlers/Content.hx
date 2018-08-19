@@ -6,6 +6,7 @@ import com.akifox.asynchttp.HttpMethod;
 import com.akifox.asynchttp.HttpResponse;
 import beartek.matrix_im.client.types.Content_uri;
 import beartek.matrix_im.client.types.enums.Thumb_method;
+using StringTools;
 
 class Content extends Handler {
 
@@ -13,12 +14,12 @@ class Content extends Handler {
     super(on_responses, send_request, server);
   }
 
-  public function upload(filename: String, mimetype: String, content: haxe.io.Bytes, ?on_response: Content_uri -> Void) : Void {
+  public function upload(filename: String, mimetype: String, content: Dynamic, ?on_response: Content_uri -> Void) : Void {
     var request = new HttpRequest({
       url: server + '/_matrix/media/r0/upload?filename=' + filename,
       method: HttpMethod.POST,
       contentType: mimetype,
-      content: content.getString(0, content.length)
+      content: content
     });
     this.send_request(request, function ( status : Int, data: {content_uri: String} ) : Void {
       on_response(new Content_uri(data.content_uri));
@@ -64,7 +65,7 @@ class Content extends Handler {
   }
 
   public function preview_url(url: String, time: Int, ?on_response: Map<String, String> -> Void) : Void {
-    this.send_request(Conection.make_request(HttpMethod.GET, server + '/_matrix/media/r0/preview_url?url=' + url + '&ts=' + time, null), function ( status : Int, data: Dynamic ) : Void {
+    this.send_request(Conection.make_request(HttpMethod.GET, server + '/_matrix/media/r0/preview_url?url=' + url.urlEncode() + '&ts=' + time, null), function ( status : Int, data: Dynamic ) : Void {
       on_response(Conection.to_object_map(data));
     });
   }

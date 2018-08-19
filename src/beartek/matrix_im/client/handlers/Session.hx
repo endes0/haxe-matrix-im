@@ -18,9 +18,13 @@ class Session extends Handler {
   function set_access_token(token:String): String {
     this.access_token = token;
 
-    for (func in open_handlers) {
-      func(token);
-    }
+    this.send_request(Conection.make_request('GET', server + '/_matrix/client/r0/account/whoami', null), function( status : Int, data : {user_id: String} ) : Void {
+      this.user = new User(data.user_id);
+
+      for (func in open_handlers) {
+        func(token);
+      }
+    });
 
     return token;
   }

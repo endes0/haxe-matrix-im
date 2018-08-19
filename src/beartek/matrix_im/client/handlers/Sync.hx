@@ -11,7 +11,7 @@ import beartek.matrix_im.client.types.replys.Left_room;
 
 
 class Sync extends Handler {
-  var batch : Map<String,String> = new Map();
+  public var batch : Map<String,String> = new Map();
   var presence_handlers : Array<Array<Event<Dynamic>> -> Void> = [];
   var account_data_handlers : Array<Array<Event<Dynamic>> -> Void> = [];
   var joined_handlers : Array<Map<String,Joined_room> -> Void> = [];
@@ -23,13 +23,12 @@ class Sync extends Handler {
   }
 
   public function sync( ?filter_id : String, ?filter : Dynamic, presence : Presences = Online, timeout : Int = 0, ?since : String, ?on_response : {next_bath : String, rooms : {join: Map<String,Joined_room>, invite: Map<String,Invited_room>, leave: Map<String,Left_room>}, presence : Array<Event<Dynamic>>, account_data : Array<Event<Dynamic>>} -> Void ) : Void {
-    var req = Conection.make_request('GET', server + '/_matrix/client/r0/sync?filter=' + (if(filter) filter else filter_id) +
-          (if(since != null || this.batch.exists(filter_id)) '&since=' + if(since != null) since else this.batch[filter_id] else '') +
-          '&set_presence=' + presence
-          + '&timeout=' + timeout, null);
+    var req = Conection.make_request('GET', server + '/_matrix/client/r0/sync?timeout=' + timeout +
+          (if(since != null || this.batch.exists(if(filter_id != null) filter_id else '000')) '&since=' + if(since != null) since else this.batch[if(filter_id != null) filter_id else '000'] else '') +
+          '&set_presence=' + presence + (if(filter != null || filter_id != null) '&filter=' + if(filter != null) filter else filter_id else ''), null);
     req.timeout = timeout + 50;
     this.send_request(req, function( status : Int, data : Dynamic ) : Void {
-      this.batch[filter_id] = data.next_bath;
+      this.batch[if(filter_id != null) filter_id else '000'] = data.next_batch;
       var result = this.on_sync(data);
       if( on_response != null ) {
         on_response(result);

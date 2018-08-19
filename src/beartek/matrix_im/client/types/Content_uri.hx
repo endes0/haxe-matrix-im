@@ -18,6 +18,10 @@ abstract Content_uri(Content_body) {
     return 'mxc://' + this.server + '/' + this.id;
   }
 
+  public inline function toURL(server: String) : String {
+    return server + '/_matrix/media/r0/download/' + this.server + '/' + this.id;
+  }
+
   public inline function get_media_id() : String {
     return this.id;
   }

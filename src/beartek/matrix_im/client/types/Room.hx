@@ -18,7 +18,7 @@ abstract Room(Room_body) {
     return '!' + this.name + ':' + this.server;
   }
 
-  public inline function get_name(?name_event: Event<m.room.Name>, ?canocial_alias: Event<m.room.Canonical_alias>, members: Map<String,{id: User, avatar_url: String}>) : String {
+  public inline function get_name(?name_event: Event<m.room.Name>, ?canocial_alias: Event<m.room.Canonical_alias>, members: Iterator<String>) : String {
     if(name_event != null){
       return name_event.content.name;
     } else if(canocial_alias != null) {
@@ -28,10 +28,10 @@ abstract Room(Room_body) {
         var name1: String = '';
         var name2: String = '';
         var more = false;
-        for(m in members.keys()) {
-          if(name1 == null) {
+        for(m in members) {
+          if(name1 == '') {
             name1 = m;
-          } else if(name1 == null) {
+          } else if(name2 == '') {
             name2 = m;
           } else {
             more = true;
@@ -39,9 +39,9 @@ abstract Room(Room_body) {
           }
         }
 
-        if(name1 != null && name2 == null) {
+        if(name1 != '' && name2 == '') {
           return name1;
-        } else if(name1 != null && name2 != null && !more) {
+        } else if(name1 != '' && name2 != '' && !more) {
           return name1 + ' And ' + name2;
         } else {
           return name1 + ', ' + name2 + ' And more';

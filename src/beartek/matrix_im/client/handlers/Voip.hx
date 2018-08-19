@@ -13,8 +13,6 @@ class Voip extends Handler {
 
   public function new( on_responses : Int -> Dynamic -> ?Bool -> Bool, send_request : HttpRequest -> (Int -> Dynamic -> Void) -> ?Bool -> Void, server : String ) {
     super(on_responses, send_request, server);
-
-    this.update_turn();
   }
 
   public function get_turn_servers(?on_response: Turn_Servers -> Void) : Void {
@@ -34,13 +32,13 @@ class Voip extends Handler {
       return null;
   }
 
-  private function update_turn() {
+  public function update_turn() {
     this.get_turn_servers(function(data: Turn_Servers) {
         this.turn_username = data.username;
         this.turn_password = data.password;
         this.turn_servers = data.uris;
 
-        haxe.Timer.delay(update_turn, data.ttl);
+        haxe.Timer.delay(update_turn, if(data.ttl != null && data.ttl != 0) data.ttl else 3600000);
     });
   }
 }

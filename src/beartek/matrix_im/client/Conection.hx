@@ -59,6 +59,7 @@ class Conection {
       this.rooms.check_typing(2500, this.session.user);
       this.presence.user = this.session.user;
       this.presence.update_list(this.session.user, 30000);
+      //this.voip.update_turn(); Spam of petitions, dont recomended to use
     });
   }
 
@@ -71,7 +72,7 @@ class Conection {
   }
 
   public static function make_request( method : String, url : String, data : Dynamic ) : HttpRequest {
-    var request = new HttpRequest({
+    var request = new HttpRequest({      
       url: url,
       method: method,
       contentType: if(data != null) "application/json" else null,
@@ -99,7 +100,7 @@ class Conection {
         on_response(response.status, response.toJson());
       }
     };
-    request.async = false;
+    request.async = true;
     request.send();
   }
 
